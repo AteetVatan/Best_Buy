@@ -45,3 +45,4 @@ class Product(ProductModel):
             return self.price * quantity
         except ValueError as e:
             print(constant.EXCEPTION_STRING.format(field="quantity", exception=e))
+            raise
