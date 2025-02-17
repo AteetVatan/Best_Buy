@@ -1,10 +1,10 @@
-import pytest
+"""The User Menu Test Module."""
 from unittest.mock import patch
-from constants import constant
-from serviceLayer.user_menu import UserMenu
-from serviceLayer.store import Store
-from serviceLayer.products import Product
-import sys
+import pytest
+from constants.constant_strings import ConstantStrings
+from service_layer.user_menu import UserMenu
+from service_layer.store import Store
+from service_layer.products import Product
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def test_display_menu(mock_print):
         with pytest.raises(SystemExit):
             UserMenu.display_menu()
 
-    mock_print.assert_any_call(constant.MENU_HEADER)
+    mock_print.assert_any_call(ConstantStrings.MENU_HEADER)
 
 
 @patch("builtins.print")
@@ -57,8 +57,9 @@ def test_dummy_order_and_store_quantity(mock_print):
         UserMenu.make_order()
 
     expected_stock = initial_stock - 100
-    assert UserMenu.get_store().get_total_quantity() == expected_stock, "Store quantity should be updated after order"
-    mock_print.assert_any_call(constant.MAKE_ORDER_PRODUCT_ADDED)
+    assert UserMenu.get_store().get_total_quantity() == expected_stock, \
+        "Store quantity should be updated after order"
+    mock_print.assert_any_call(ConstantStrings.MAKE_ORDER_PRODUCT_ADDED)
 
 
 @patch("builtins.print")
@@ -68,8 +69,9 @@ def test_order_cancellation_restores_store(mock_print):
     with patch("builtins.input", side_effect=["1", "", ""]):  # Cancelling after selecting product
         UserMenu.make_order()
 
-    assert UserMenu.get_store().get_total_quantity() == initial_quantity, "Store quantity should be restored after order cancellation"
-    mock_print.assert_any_call(constant.MAKE_ORDER_CANCEL)
+    assert UserMenu.get_store().get_total_quantity() == initial_quantity, \
+        "Store quantity should be restored after order cancellation"
+    mock_print.assert_any_call(ConstantStrings.MAKE_ORDER_CANCEL)
 
 
 @patch("builtins.print")
@@ -78,8 +80,11 @@ def test_order_exceeding_stock(mock_print):
     with patch("builtins.input", side_effect=["2", "999", "", ""]):
         UserMenu.make_order()
 
-    mock_print.assert_any_call(constant.MAKE_ORDER_SELECT_QUANTITY_ERROR.replace("CE-", "").format(max_amt=500))
-    assert UserMenu.get_store().get_total_quantity() == 850, "Store quantity should remain unchanged when order exceeds stock"
+    mock_print.assert_any_call(ConstantStrings.
+                               MAKE_ORDER_SELECT_QUANTITY_ERROR.
+                               replace("CE-", "").format(max_amt=500))
+    assert UserMenu.get_store().get_total_quantity() == 850, \
+        "Store quantity should remain unchanged when order exceeds stock"
 
 
 @patch("builtins.print")
@@ -89,18 +94,18 @@ def test_invalid_menu_choice(mock_print):
         with pytest.raises(SystemExit):
             UserMenu.display_menu()
 
-    mock_print.assert_any_call(constant.MENU_OPT_INVALID)
+    mock_print.assert_any_call(ConstantStrings.MENU_OPT_INVALID)
 
 
 @patch("builtins.print")
 def test_list_products(mock_print):
     """Test listing products."""
     UserMenu.list_products()
-    mock_print.assert_any_call(constant.PRODUCT_LIST_HEADER)
+    mock_print.assert_any_call(ConstantStrings.PRODUCT_LIST_HEADER)
     mock_print.assert_any_call("1. MacBook Air M2, Price: $1450, Quantity: 100")
     mock_print.assert_any_call("2. Bose QuietComfort Earbuds, Price: $250, Quantity: 500")
     mock_print.assert_any_call("3. Google Pixel 7, Price: $500, Quantity: 250")
-    mock_print.assert_any_call(constant.PRODUCT_LIST_FOOTER)
+    mock_print.assert_any_call(ConstantStrings.PRODUCT_LIST_FOOTER)
 
 
 @patch("builtins.print")
@@ -110,8 +115,10 @@ def test_make_order_invalid_product(mock_print):
         UserMenu.make_order()
 
     prd_len = len(UserMenu.get_store().get_all_products())
-    mock_print.assert_any_call(constant.MAKE_ORDER_CANCEL)
-    mock_print.assert_any_call(constant.MAKE_ORDER_ADD_PRODUCT_INDEX_ERROR.replace("CE-", "").format(prd_len=prd_len))
+    mock_print.assert_any_call(ConstantStrings.MAKE_ORDER_CANCEL)
+    mock_print.assert_any_call(
+        ConstantStrings.MAKE_ORDER_ADD_PRODUCT_INDEX_ERROR.
+        replace("CE-", "").format(prd_len=prd_len))
 
 
 @patch("builtins.print")
@@ -120,5 +127,5 @@ def test_exit_during_order(mock_print):
     with patch("builtins.input", side_effect=[""]):
         UserMenu.make_order()
 
-    mock_print.assert_any_call(constant.MAKE_ORDER_CANCEL)
+    mock_print.assert_any_call(ConstantStrings.MAKE_ORDER_CANCEL)
     assert UserMenu.get_store().get_total_quantity() == 850

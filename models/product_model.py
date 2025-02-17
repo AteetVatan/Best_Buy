@@ -1,6 +1,6 @@
 """The Product Model Module."""
-from constants import constant
 import uuid
+from constants.constant_strings import ConstantStrings
 
 
 class ProductModel:
@@ -22,10 +22,10 @@ class ProductModel:
     def name(self, value: str):
         try:
             if not isinstance(value, str) or not value.strip():
-                raise ValueError(constant.PRODUCT_NAME_ERROR)
+                raise ValueError(ConstantStrings.PRODUCT_NAME_ERROR)
             self.__name = value.strip()
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="name", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="name", exception=e))
             raise  # re-raises the same exception
 
     @property
@@ -37,10 +37,10 @@ class ProductModel:
     def price(self, value: (int, float)):
         try:
             if not isinstance(value, (int, float)) or value < 0:
-                raise ValueError(constant.PRODUCT_PRICE_ERROR)
+                raise ValueError(ConstantStrings.PRODUCT_PRICE_ERROR)
             self.__price = value
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="price", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="price", exception=e))
             raise
 
     @property
@@ -52,10 +52,10 @@ class ProductModel:
     def quantity(self, value: (int, float)):
         try:
             if not isinstance(value, (int, float)) or value < 0:
-                raise ValueError(constant.PRODUCT_QUANTITY_ERROR)
+                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
             self.__quantity = value
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="quantity", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
 
     @property
@@ -79,4 +79,7 @@ class ProductModel:
 
     def __str__(self):
         """The Product info object."""
-        return f"Product(name={self.__name}, price={self.__price}, quantity={self.__quantity}, active={self.__active})"
+        return (f"Product(name={self.__name}, "
+                f"price={self.__price}, "
+                f"quantity={self.__quantity}, "
+                f"active={self.__active})")

@@ -1,8 +1,9 @@
+"""The Store Module."""
 import copy
 from typing import List, Tuple, Optional
 from datetime import datetime
-from constants import constant
-from serviceLayer.products import Product
+from constants.constant_strings import ConstantStrings
+from service_layer.products import Product
 
 
 class Store:
@@ -21,9 +22,9 @@ class Store:
             if isinstance(product, Product):
                 self.__products.append(product)
             else:
-                raise ValueError(constant.PRODUCT_INVALID_TYPE)
+                raise ValueError(ConstantStrings.PRODUCT_INVALID_TYPE)
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="product", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="product", exception=e))
 
     def remove_product(self, product: List[Product]):
         """Removes a product from store."""
@@ -31,13 +32,13 @@ class Store:
             if isinstance(product, Product):
                 self.__products.remove(Product)
             else:
-                raise ValueError(constant.PRODUCT_INVALID_TYPE)
+                raise ValueError(ConstantStrings.PRODUCT_INVALID_TYPE)
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="product", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="product", exception=e))
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        return sum([x.quantity for x in self.__products])
+        return sum((x.quantity for x in self.__products))
 
     def get_all_products(self) -> List[Product]:
         """Returns all products in the store that are active."""
@@ -55,14 +56,15 @@ class Store:
             order_price = 0.0
             for item in shopping_list:
                 if item[0] not in self.__products:
-                    raise ValueError(constant.STORE_PRODUCT_NOT_EXISTS.format(name=item[0].name))
+                    raise ValueError(ConstantStrings.
+                                     STORE_PRODUCT_NOT_EXISTS.format(name=item[0].name))
 
                 order_price += item[0].buy(item[1])
             return order_price
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="order", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="order", exception=e))
             raise
 
     def __str__(self):
         """String representation of the Store."""
-        return constant.STORE_INFO.format(length=len(self.products))
+        return ConstantStrings.STORE_INFO.format(length=len(self.__products))

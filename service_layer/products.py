@@ -1,9 +1,10 @@
 """The Main Product Class"""
 from models.product_model import ProductModel
-from constants import constant
+from constants.constant_strings import ConstantStrings
 
 
 class Product(ProductModel):
+    """The Product Class."""
     def __init__(self, name, price, quantity):
         super().__init__(name, price, quantity)
 
@@ -32,13 +33,13 @@ class Product(ProductModel):
         try:
             # check quantity is less than existing
             if quantity > self.quantity:
-                raise ValueError(constant.PRODUCT_QUANTITY_NOT_AVAILABLE)
+                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_NOT_AVAILABLE)
 
             if quantity < 0:
-                raise ValueError(constant.PRODUCT_QUANTITY_ERROR)
+                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
 
             self.quantity -= quantity
             return self.price * quantity
         except ValueError as e:
-            print(constant.EXCEPTION_STRING.format(field="quantity", exception=e))
+            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
             raise

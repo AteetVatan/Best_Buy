@@ -1,4 +1,4 @@
 """The constants package init module"""
-from constants import constant
+from constants.constant_strings import ConstantStrings
 
-__all__ = ["constant"]
+__all__ = ["ConstantStrings"]
