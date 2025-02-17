@@ -19,10 +19,6 @@ class Product(ProductModel):
         """Deactivates the Product."""
         self.active = False
 
-    def show(self) -> None:
-        """The Product Info"""
-        print(self)
-
     def set_quantity(self, value: (int, float)):
         """Method to set the Product Quantity"""
         self.quantity = value

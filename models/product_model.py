@@ -73,6 +73,10 @@ class ProductModel:
         """Product Unique ID."""
         return self.__id
 
+    def show(self) -> None:
+        """The Product Info"""
+        return f"{self.__name}, Price: ${self.__price}, Quantity: {self.__quantity}"
+
     def __str__(self):
-        """The Product info."""
+        """The Product info object."""
         return f"Product(name={self.__name}, price={self.__price}, quantity={self.__quantity}, active={self.__active})"

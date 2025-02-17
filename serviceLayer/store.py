@@ -1,5 +1,6 @@
+import copy
 from typing import List, Tuple, Optional
-
+from datetime import datetime
 from constants import constant
 from serviceLayer.products import Product
 
@@ -7,8 +8,12 @@ from serviceLayer.products import Product
 class Store:
     """The Store Class to manage products."""
 
+    __store_instances: List[Tuple[List[Product], str]] = []
+
     def __init__(self, products: Optional[List[Product]] = None):
         self.__products: List[Product] = products if products is not None else []
+        formatted_time = datetime.now().strftime("%d.%m.%Y %H.%M.%S")
+        Store.__store_instances.append((formatted_time, copy.deepcopy(self.__products)))
 
     def add_product(self, product: List[Product]):
         """Adds a new product to the store."""
@@ -32,7 +37,7 @@ class Store:
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        return len(self.__products)
+        return sum([x.quantity for x in self.__products])
 
     def get_all_products(self) -> List[Product]:
         """Returns all products in the store that are active."""
