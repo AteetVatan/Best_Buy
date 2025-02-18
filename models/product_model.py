@@ -7,26 +7,10 @@ class ProductModel:
     """The Product Model Class."""
 
     def __init__(self, name, price, quantity):
-        try:
-            if not isinstance(name, str):
-                raise TypeError(ConstantStrings.PRODUCT_NAME_ERROR)
-
-            if not isinstance(price, (int, float)) or price < 0:
-                raise ValueError(ConstantStrings.PRODUCT_PRICE_ERROR)
-
-            if not isinstance(quantity, (int, float)) or quantity < 0:
-                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
-
-            self.__name: str = name
-            self.__price: float = price
-            self.__quantity: (int, float) = quantity
-
-            self.__active: bool = True
-            self.__id: int = uuid.uuid4().int  # unique id to identify the product
-
-        except (TypeError, ValueError) as e:
-            print(f"Invalid parameter ProductModel: {e}")
-            raise
+        self.__id = None
+        self.name = name
+        self.price = price
+        self.quantity = quantity
 
     @property
     def name(self):
@@ -76,16 +60,13 @@ class ProductModel:
     @property
     def active(self):
         """Is Product Active."""
-        return self.__active
-
-    @active.setter
-    def active(self, value: bool):
-        """Is Product Active."""
-        self.__active = value
+        return self.__quantity > 0
 
     @property
     def id(self):
         """Product Unique ID."""
+        if not self.__id:
+            self.__id: int = uuid.uuid4().int  # unique id to identify the product
         return self.__id
 
     def show(self) -> str:

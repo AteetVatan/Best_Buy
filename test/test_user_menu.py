@@ -4,24 +4,18 @@ import pytest
 from constants.constant_strings import ConstantStrings
 from service_layer.user_menu import UserMenu
 from service_layer.store import Store
-from service_layer.products import Product
+from service_layer.product import Product
 
 
-@pytest.fixture
-def real_store():
-    """Fixture to create a real Store object with actual products."""
+@pytest.fixture(autouse=True)
+def setup_store():
+    """Set up the real store for all test cases."""
     store = Store([
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250)
     ])
-    return store
-
-
-@pytest.fixture(autouse=True)
-def setup_store(real_store):
-    """Set up the real store for all test cases."""
-    UserMenu.set_store(real_store)
+    UserMenu.set_store(store)
 
 
 def test_validate_user_menu_methods():

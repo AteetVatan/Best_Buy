@@ -5,20 +5,18 @@ from constants.constant_strings import ConstantStrings
 
 class Product(ProductModel):
     """The Product Class."""
-    def __init__(self, name, price, quantity):
-        super().__init__(name, price, quantity)
 
     def is_active(self) -> None:
         """Return is Product active."""
         return self.active
 
-    def activate(self) -> None:
-        """Activates the Product."""
-        self.active = True
-
-    def deactivate(self) -> None:
-        """Deactivates the Product."""
-        self.active = False
+    # def activate(self) -> None:
+    #     """Activates the Product."""
+    #     self.active = True
+    #
+    # def deactivate(self) -> None:
+    #     """Deactivates the Product."""
+    #     self.active = False
 
     def set_quantity(self, value: (int, float)):
         """Method to set the Product Quantity"""
@@ -31,6 +29,8 @@ class Product(ProductModel):
         :return:  the total price (float) of the purchase.
         """
         try:
+            if not isinstance(quantity, (int, float)):
+                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
             # check quantity is less than existing
             if quantity > self.quantity:
                 raise ValueError(ConstantStrings.PRODUCT_QUANTITY_NOT_AVAILABLE)

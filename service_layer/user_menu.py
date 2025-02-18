@@ -5,7 +5,7 @@ from typing import Tuple, List
 
 from constants.constant_strings import ConstantStrings
 from service_layer.store import Store
-from service_layer.products import Product
+from service_layer.product import Product
 
 
 class UserMenu:
