@@ -1,16 +1,40 @@
 """The Product Model Module."""
 import uuid
-from constants.constant_strings import ConstantStrings
+from abc import ABC, abstractmethod
+from helpers.product_validators import ProductValidators
 
 
-class ProductModel:
+class ProductModel(ABC, ProductValidators):
     """The Product Model Class."""
 
-    def __init__(self, name, price, quantity):
-        self.__id = None
-        self.name = name
-        self.price = price
-        self.quantity = quantity
+    # setup initial stock of inventory
+    # product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
+    #                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+    #                 products.Product("Google Pixel 7", price=500, quantity=250),
+    #                 products.NonStockedProduct("Windows License", price=125),
+    #                 products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
+    #                 ]
+    # best_buy = store.Store(product_list)
+
+    def __init__(self, name, price, quantity=None, maximum=None):
+        self.__active = None
+        self.__name: str = None
+        self.__price: (int, float) = None
+        self.__quantity: (int, float) = None
+        self.__maximum_order_quantity: (int, float) = None
+        self.__active: bool = True  # By default, all products are active.
+        self.__id = uuid.uuid4().int  # Unique product id
+        self.name, self.price, self.quantity, self.maximum = name, price, quantity, maximum
+
+    @abstractmethod
+    def buy(self, buy_quantity: (int, float)):
+        """Abstract method to buy product."""
+        pass
+
+    @abstractmethod
+    def buy_validation(self, buy_quantity: (int, float)):
+        """Abstract method to validate buy_quantity."""
+        pass
 
     @property
     def name(self):
@@ -19,13 +43,8 @@ class ProductModel:
 
     @name.setter
     def name(self, value: str):
-        try:
-            if not isinstance(value, str) or not value.strip():
-                raise ValueError(ConstantStrings.PRODUCT_NAME_ERROR)
-            self.__name = value.strip()
-        except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="name", exception=e))
-            raise  # re-raises the same exception
+        """Method to validate_and_set_name"""
+        self.__name = ProductModel.validate_name(value)
 
     @property
     def price(self):
@@ -34,13 +53,8 @@ class ProductModel:
 
     @price.setter
     def price(self, value: (int, float)):
-        try:
-            if not isinstance(value, (int, float)) or value < 0:
-                raise ValueError(ConstantStrings.PRODUCT_PRICE_ERROR)
-            self.__price = value
-        except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="price", exception=e))
-            raise
+        """Method to validate_and_set_name"""
+        self.__price = ProductModel.validate_price(value)
 
     @property
     def quantity(self):
@@ -49,33 +63,55 @@ class ProductModel:
 
     @quantity.setter
     def quantity(self, value: (int, float)):
-        try:
-            if not isinstance(value, (int, float)) or value < 0:
-                raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
-            self.__quantity = value
-        except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
-            raise
+        """Product Quantity."""
+        if value is not None:
+            self.__quantity = ProductModel.validate_quantity(value)
+
+    @property
+    def maximum(self):
+        """Product Maximum Quantity."""
+        return self.__maximum_order_quantity
+
+    @maximum.setter
+    def maximum(self, value: (int, float)):
+        """Product Maximum Quantity."""
+        if value is not None:
+            self.__maximum_order_quantity = ProductModel.validate_quantity(value)
 
     @property
     def active(self):
         """Is Product Active."""
-        return self.__quantity > 0
+        return self.__active
+
+    @active.setter
+    def active(self, val: bool):
+        """Sets Product Active."""
+        self.__active = ProductModel.validate_active(val)
 
     @property
     def id(self):
         """Product Unique ID."""
-        if not self.__id:
-            self.__id: int = uuid.uuid4().int  # unique id to identify the product
         return self.__id
 
     def show(self) -> str:
         """The Product Info"""
-        return f"{self.__name}, Price: ${self.__price}, Quantity: {self.__quantity}"
+        attributes = {
+            "": self.__name,
+            "Price: $": self.__price,
+            "Quantity: ": self.__quantity,
+            "Maximum: ": self.__maximum_order_quantity
+        }
+        return " ,".join(f"{k}{v}" for k, v in attributes.items() if v is not None)
 
     def __str__(self):
         """The Product info object."""
-        return (f"Product(name={self.__name}, "
-                f"price={self.__price}, "
-                f"quantity={self.__quantity}, "
-                f"active={self.__active})")
+        """The Product info object."""
+        attributes = {
+            "name": self.__name,
+            "price": self.__price,
+            "quantity": self.__quantity,
+            "active": self.__active,
+            "maximum": self.__maximum_order_quantity
+        }
+        obj_str = " ,".join(f"{k}={v}" for k, v in attributes.items() if v is not None)
+        return f"Product({obj_str})"

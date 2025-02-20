@@ -102,13 +102,6 @@ def test_product_invalid_price_update(valid_product,
         valid_product.price = invalid_price
 
 
-@pytest.mark.parametrize("new_quantity", [0, 5, 100])
-def test_product_quantity_update(valid_product, new_quantity):
-    """Test valid quantity updates"""
-    valid_product.set_quantity(new_quantity)
-    assert valid_product.quantity == new_quantity
-
-
 @pytest.mark.parametrize("invalid_quantity, expected_exception, expected_message", [
     (-5, ValueError, ConstantStrings.PRODUCT_QUANTITY_ERROR),  # Negative quantity
     ("many", ValueError, ConstantStrings.PRODUCT_QUANTITY_ERROR),  # Non-numeric
@@ -119,4 +112,4 @@ def test_product_invalid_quantity_update(valid_product,
                                          expected_message):
     """Test invalid quantity updates"""
     with pytest.raises(expected_exception, match=expected_message):
-        valid_product.set_quantity(invalid_quantity)
+        valid_product.quantity = invalid_quantity

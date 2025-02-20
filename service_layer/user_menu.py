@@ -1,11 +1,12 @@
 """The User Menu Module."""
 import copy
+import math
 import sys
 from typing import Tuple, List
 
 from constants.constant_strings import ConstantStrings
+from service_layer import Product, LimitedProduct, NonStockedProduct
 from service_layer.store import Store
-from service_layer.product import Product
 
 
 class UserMenu:
@@ -128,20 +129,30 @@ class UserMenu:
     @classmethod
     def __select_quantity(cls, product_item):
         """Handles quantity selection for the chosen product."""
-        max_amt = product_item.quantity
+        if isinstance(product_item, NonStockedProduct):
+            max_amt = None
+        elif isinstance(product_item, LimitedProduct):
+            max_amt = product_item.maximum
+        elif isinstance(product_item, Product):
+            max_amt = product_item.quantity
+
         while True:
-            val = input(ConstantStrings.MAKE_ORDER_SELECT_QUANTITY.format(max_amt=max_amt)).strip()
+            if max_amt is not None:
+                val = input(ConstantStrings.MAKE_ORDER_SELECT_QUANTITY_WITH_MAX.format(max_amt=max_amt)).strip()
+            else:
+                val = input(ConstantStrings.MAKE_ORDER_SELECT_QUANTITY).strip()
 
             if val == "":
                 return None  # User wants to cancel and reselect product
 
             try:
                 amt = float(val)
-                if amt > max_amt:
-                    raise ValueError(ConstantStrings.
-                                     MAKE_ORDER_SELECT_QUANTITY_ERROR.format(max_amt=max_amt))
                 if amt < 0:
                     raise ValueError(ConstantStrings.MAKE_ORDER_INVALID_QUANTITY)
+
+                if max_amt is not None and amt > max_amt:
+                    raise ValueError(ConstantStrings.
+                                     MAKE_ORDER_SELECT_QUANTITY_ERROR.format(max_amt=max_amt))
                 return amt
 
             except ValueError as e:

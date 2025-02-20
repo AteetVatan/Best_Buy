@@ -38,7 +38,7 @@ class Store:
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
-        return sum((x.quantity for x in self.__products))
+        return sum((x.quantity for x in self.__products if x.quantity is not None))
 
     def get_all_products(self) -> List[Product]:
         """Returns all products in the store that are active."""

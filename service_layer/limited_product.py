@@ -1,27 +1,12 @@
-"""The Main Product Class"""
+"""The Non StockProduct Module"""
+from constants import ConstantStrings
 from models.product_model import ProductModel
-from constants.constant_strings import ConstantStrings
 
 
-class Product(ProductModel):
-    """The Product Class."""
-
-    def __init__(self, name: str, price: (int, float), quantity: (int, float)):
-        super().__init__(name, price, quantity)
-
-    def is_active(self) -> None:
-        """Return is Product active."""
-        return self.active
-
-    # def activate(self) -> None:
-    #     """Activates the Product."""
-    #     self.active = True
-    #
-    # def deactivate(self) -> None:
-    #     """Deactivates the Product."""
-    #     self.active = False
-
-
+class LimitedProduct(ProductModel):
+    """The Non StockProduct Class"""
+    def __init__(self, name, price, quantity, maximum):
+        super().__init__(name, price, quantity, maximum)
 
     def buy(self, buy_quantity: (int, float)) -> float:
         """Method to buy the product"""
@@ -43,6 +28,9 @@ class Product(ProductModel):
         if buy_quantity == 0:
             # Nothing was Bought
             raise ValueError(ConstantStrings.PRODUCT_BUY_QUANTITY_ERROR)
+        if buy_quantity > self.maximum:
+            # buy_quantity is greater than maximum shippable quantity size
+            raise ValueError(ConstantStrings.PRODUCT_QUANTITY_EXCEED_MAXIMUM)
         if buy_quantity > self.quantity:
             # buy_quantity is greater than product quantity
             raise ValueError(ConstantStrings.PRODUCT_QUANTITY_NOT_AVAILABLE)
