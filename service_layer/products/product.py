@@ -1,13 +1,12 @@
 """The Main Product Class"""
-from models.product_model import ProductModel
+from typing import Tuple
+from helpers import UserText
+from models import ProductModel
 from constants.constant_strings import ConstantStrings
 
 
 class Product(ProductModel):
     """The Product Class."""
-
-    def __init__(self, name: str, price: (int, float), quantity: (int, float)):
-        super().__init__(name, price, quantity)
 
     def is_active(self) -> None:
         """Return is Product active."""
@@ -21,16 +20,19 @@ class Product(ProductModel):
     #     """Deactivates the Product."""
     #     self.active = False
 
-
-
-    def buy(self, buy_quantity: (int, float)) -> float:
-        """Method to buy the product"""
+    def buy(self, buy_quantity: (int, float)) -> Tuple[float, str]:
+        """Method to buy the product.
+        :param buy_quantity: The Product Quantity.
+        :return: (price, applied_promotion_name) of type Tuple[float, str].
+        """
         try:
             self.buy_validation(buy_quantity)
+            price_promotion_tuple = self.get_best_price(buy_quantity)
             self.quantity -= buy_quantity
-            return self.price * buy_quantity
+            return price_promotion_tuple
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
 
     def buy_validation(self, buy_quantity: (int, float)):

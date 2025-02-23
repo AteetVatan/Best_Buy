@@ -1,17 +1,89 @@
 """Test Module for product class."""
 import pytest
 from constants import ConstantStrings
-from service_layer.product import Product
+from service_layer.products.product import Product
+
+
+# Test Magic Methods
+def test_greater_less_then_products():
+    """Test valid purchases"""
+    prod1 = Product("Phone1", price=1000, quantity=100)
+    prod2 = Product("Phone2", price=2000, quantity=100)
+
+    assert prod2 > prod1
+    assert not prod2 < prod1
+
+
+# Test Promotions
+@pytest.mark.parametrize("quantity, expected_total, "
+                         "expected_promotion ,test_promotions", [
+                             (1, 1000, None, ("second_half_price",)),
+                             (2, 1500, "second_half_price",
+                              ("second_half_price",)),
+                             (5, 4000, "second_half_price",
+                              ("second_half_price", "third_one_free")),
+                             (6, 4000, "third_one_free",
+                              ("second_half_price", "third_one_free")),
+                             (10, 7000, "third_one_free",
+                              ("second_half_price", "third_one_free", "thirty_percent"))
+                         ])
+def test_product_buy_valid_promotions(valid_product, promotions, quantity,
+                                      expected_total,
+                                      expected_promotion, test_promotions):
+    """Test valid purchases"""
+    valid_product.multiple_promotion = tuple(promotions[x] for x in test_promotions)
+    total_cost_tuple = valid_product.buy(quantity)
+    applied_promotion = dict(enumerate(total_cost_tuple)).get(1, None)
+    assert applied_promotion == expected_promotion
+    assert total_cost_tuple[0] == expected_total
 
 
 # --- Test Cases for ProductModel ---
-def test_product_valid():
+def test_product_valid(valid_product):
     """Test valid product creation"""
-    product = Product("Phone", 700, 5)
+    product = valid_product
     assert product.name == "Phone"
-    assert product.price == 700
-    assert product.quantity == 5
+    assert product.price == 1000
+    assert product.quantity == 100
     assert product.active is True
+    product.quantity = 0
+    assert product.active is False
+
+
+def test_limited_product_valid(valid_limited_product):
+    """Test valid product creation"""
+    product = valid_limited_product
+    assert product.name == "Phone"
+    assert product.price == 1000
+    assert product.quantity == 100
+    assert product.maximum == 10
+    assert product.active is True
+
+
+def test_non_stocked_product_valid(valid_non_stocked_product):
+    """Test valid product creation"""
+    product = valid_non_stocked_product
+    assert product.name == "Phone"
+    assert product.price == 1000
+    assert product.active is True
+
+
+def test_product_with_promotion_valid(valid_product, promotions):
+    """Test valid product creation"""
+    product = valid_product
+    product.multiple_promotion.promotions = promotions["second_half_price"]
+    price_promotion_tuple = valid_product.buy(4)
+    assert price_promotion_tuple[0] == 3000
+    assert price_promotion_tuple[1] == "second_half_price"
+
+
+def test_product_with_multiple_promotion_valid(valid_product, promotions):
+    """Test valid product creation"""
+    product = valid_product
+    product.multiple_promotion.promotions = tuple(promotions.values())
+    price_promotion_tuple = valid_product.buy(4)
+    assert price_promotion_tuple[0] == 2800
+    assert price_promotion_tuple[1] == "thirty_percent"
 
 
 @pytest.mark.parametrize("name, price, quantity, expected_exception, expected_message", [
@@ -37,14 +109,6 @@ def test_product_model_invalid_price(name, price, quantity, expected_exception, 
         Product(name, price, quantity)
 
 
-def test_product_buy_exact_quantity(valid_product):
-    """Test that buying exact stock deactivates product"""
-    total_cost = valid_product.buy(10)
-    assert valid_product.quantity == 0
-    assert total_cost == 15000
-    assert valid_product.is_active() is False
-
-
 def test_product_buy_invalid_types(valid_product):
     """Test buying with invalid types"""
     with pytest.raises(ValueError, match=ConstantStrings.PRODUCT_QUANTITY_ERROR):
@@ -55,26 +119,20 @@ def test_product_buy_invalid_types(valid_product):
 
 
 @pytest.mark.parametrize("quantity, expected_remaining, expected_total", [
-    (1, 9, 1500),  # Buying 1 reduce stock to 9
-    (5, 5, 7500),  # Buying 5 reduces stock to 5
-    (10, 0, 15000)  # Buying all stock
+    (1, 99, 1000),
+    (5, 95, 5000),
+    (10, 90, 10000)
 ])
 def test_product_buy_valid(valid_product, quantity, expected_remaining, expected_total):
     """Test valid purchases"""
-    total_cost = valid_product.buy(quantity)
+    total_cost_tuple = valid_product.buy(quantity)
     assert valid_product.quantity == expected_remaining
-    assert total_cost == expected_total
-
-
-def test_product_zero_quantity_behavior(zero_quantity_product):
-    """Test behavior of a product that starts with zero quantity"""
-    assert zero_quantity_product.quantity == 0
-    assert zero_quantity_product.is_active() is False
+    assert total_cost_tuple[0] == expected_total
 
 
 @pytest.mark.parametrize("quantity, expected_exception, expected_message", [
     (-1, ValueError, ConstantStrings.PRODUCT_QUANTITY_ERROR),  # Negative quantity
-    (11, ValueError, ConstantStrings.PRODUCT_QUANTITY_NOT_AVAILABLE),  # More than available
+    (101, ValueError, ConstantStrings.PRODUCT_QUANTITY_NOT_AVAILABLE),  # More than available
 ])
 def test_product_buy_invalid(valid_product, quantity, expected_exception, expected_message):
     """Test invalid purchase scenarios"""

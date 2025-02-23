@@ -1,8 +1,11 @@
+"""Module for Product Validators."""
 from constants import ConstantStrings
+from helpers.user_text import UserText
 
 
 class ProductValidators:
     """Product Validator Class"""
+
     @staticmethod
     def validate_name(value: str):
         """Method to validate_and_set_name"""
@@ -11,7 +14,7 @@ class ProductValidators:
                 raise ValueError(ConstantStrings.PRODUCT_NAME_ERROR)
             return value.strip()
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="name", exception=e))
+            UserText.print_error(ConstantStrings.EXCEPTION_STRING.format(field="name", exception=e))
             raise  # re-raises the same exception
 
     @staticmethod
@@ -22,7 +25,8 @@ class ProductValidators:
                 raise ValueError(ConstantStrings.PRODUCT_PRICE_ERROR)
             return value
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="price", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="price", exception=e))
             raise
 
     @staticmethod
@@ -33,7 +37,8 @@ class ProductValidators:
                 raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
             return value
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
 
     @staticmethod
@@ -44,18 +49,18 @@ class ProductValidators:
                 raise ValueError(ConstantStrings.PRODUCT_MAXIMUM_ERROR)
             return value
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
 
     @staticmethod
     def validate_active(value: bool):
         """Method to validate_and_set_quantity"""
         try:
-            if not isinstance(value,bool):
+            if not isinstance(value, bool):
                 raise ValueError(ConstantStrings.PRODUCT_QUANTITY_ERROR)
             return value
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
-
-

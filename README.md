@@ -2,10 +2,12 @@
 
 ## 📌 Overview
 
-Best Buy is a Python project designed for managing retail-related tasks.
-It includes functionalities such as inventory management, price tracking to improve operational
-efficiency.
-Still in development more functionalities to come.
+The Best Buy project is a Python-based retail management application designed for:
+
+* Inventory management
+* Price tracking
+* Promotions and discount
+* User operations via a menu system
 
 ## 🚀 Getting Started
 
@@ -53,8 +55,4 @@ Use `pytest -v` for detailed test output.
 
 For inquiries, open an issue on [GitHub Issues](https://github.com/AteetVatan/Best_Buy/issues) or reach out to the
 repository owner.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
 

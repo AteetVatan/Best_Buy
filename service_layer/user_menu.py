@@ -1,11 +1,11 @@
 """The User Menu Module."""
 import copy
-import math
 import sys
 from typing import Tuple, List
 
 from constants.constant_strings import ConstantStrings
-from service_layer import Product, LimitedProduct, NonStockedProduct
+from helpers import UserText
+from service_layer.products import Product, LimitedProduct
 from service_layer.store import Store
 
 
@@ -27,7 +27,8 @@ class UserMenu:
                 raise ValueError
             cls.__store = store
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="Store", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="Store", exception=e))
             raise
 
     @classmethod
@@ -35,35 +36,37 @@ class UserMenu:
         """Displays the menu and handles user input."""
         cls.__set_menu_options()  # Init Menu List
         while True:
-            print(ConstantStrings.MENU_HEADER)
-            print("\t__________")
+            UserText.print_bold(ConstantStrings.MENU_HEADER)
+            UserText.print_blue("\t__________")
             for key, (description, _) in cls.__menu_options.items():
-                print(f"{key}. {description}", )
+                UserText.print_teal(f"{key}. {description}")
 
             try:
-                choice = int(float(input(ConstantStrings.MENU_OPT_PROMPT).strip()))
+                choice = int(float(UserText.input_prompt(ConstantStrings.MENU_OPT_PROMPT).strip()))
                 if choice in cls.__menu_options:
                     cls.__menu_options[choice][1]()
                 else:
                     raise ValueError
 
             except ValueError:
-                print(ConstantStrings.MENU_OPT_INVALID)
+                UserText.print_error(ConstantStrings.MENU_OPT_INVALID)
 
     @classmethod
     def list_products(cls) -> List[Tuple[int, Product]]:
-        """Lists all products in store. And also returns List[Tuple[int,Product]]"""
+        """Lists all products in store. And also returns List[Tuple[int, Product]]"""
         indexed_product_list = list(enumerate(cls.__store.get_all_products(), start=1))
-        print(ConstantStrings.PRODUCT_LIST_HEADER)
+        UserText.print_bold(ConstantStrings.PRODUCT_LIST_HEADER)
         for x in indexed_product_list:
             # 1. MacBook Air M2, Price: $1450, Quantity: 100
-            print(f"{x[0]}. {x[1].show()}")
-        print(ConstantStrings.PRODUCT_LIST_FOOTER)
+            UserText.print_teal(f"{x[0]}. {x[1]}")
+        UserText.print_bold(ConstantStrings.PRODUCT_LIST_FOOTER)
 
     @classmethod
     def show_total_amount(cls):
         """Displays the total amount in store."""
-        print(ConstantStrings.MENU_TOTAL_QUANTITY.format(number=cls.__store.get_total_quantity()))
+        UserText.print_success(ConstantStrings.
+                               MENU_TOTAL_QUANTITY.
+                               format(number=cls.__store.get_total_quantity()))
 
     @classmethod
     def quit_program(cls):
@@ -75,43 +78,45 @@ class UserMenu:
         """Handles the order process."""
         cls.list_products()
         indexed_product_list = list(enumerate(cls.__store.get_all_products(), start=1))
-        # Preserving the state of Store object and if order will be made only
+        # Preserving the state of Store object and if order is made only
         # and then only the Store object will be modified.
         indexed_product_list = copy.deepcopy(indexed_product_list)
         prd_len = len(indexed_product_list)
 
         if prd_len == 0:
-            print(ConstantStrings.MAKE_ORDER_NO_PRODUCTS)
+            UserText.print_error(ConstantStrings.MAKE_ORDER_NO_PRODUCTS)
             return
 
-        orders_cost_list = []
+        orders_list = []
 
         while True:
             product_item = cls.__select_product(indexed_product_list, prd_len)
             if not product_item:
-                if len(orders_cost_list) == 0:
-                    print(ConstantStrings.MAKE_ORDER_CANCEL)
+                if len(orders_list) == 0:
+                    UserText.print_error(ConstantStrings.MAKE_ORDER_CANCEL)
                 break  # User wants to exit
 
             quantity = cls.__select_quantity(product_item)
             if quantity is None:
                 continue  # User canceled quantity selection, go back to product selection
 
-            print(ConstantStrings.MAKE_ORDER_PRODUCT_ADDED)
-            orders_cost_list.append(product_item.buy(quantity))
+            UserText.print_success(ConstantStrings.MAKE_ORDER_PRODUCT_ADDED)
+            price_promotion_tuple = product_item.buy(quantity)
+            name_price_promotion_tuple = (product_item.name, quantity) + price_promotion_tuple
+            orders_list.append(name_price_promotion_tuple)
 
-        if len(orders_cost_list) == 0:
-            return  # User has not ordered Anything, go back to Main Menu
+        if len(orders_list) == 0:
+            return  # User has not ordered Anything, go back to the Main Menu
 
-        cls.__finalize_order(orders_cost_list, indexed_product_list)
+        cls.__finalize_order(orders_list, indexed_product_list)
 
     @classmethod
     def __select_product(cls, indexed_product_list, prd_len):
         """Handles product selection."""
         while True:
-            print(ConstantStrings.MAKE_ORDER_FINISH)
-            val = input(ConstantStrings.
-                        MAKE_ORDER_ADD_PRODUCT.format(prd_len=prd_len)).strip()
+            UserText.print_blue(ConstantStrings.MAKE_ORDER_FINISH)
+            val = UserText.input_prompt(ConstantStrings.
+                                        MAKE_ORDER_ADD_PRODUCT.format(prd_len=prd_len)).strip()
             if val == "":
                 return None  # User wants to exit
 
@@ -129,18 +134,21 @@ class UserMenu:
     @classmethod
     def __select_quantity(cls, product_item):
         """Handles quantity selection for the chosen product."""
-        if isinstance(product_item, NonStockedProduct):
-            max_amt = None
-        elif isinstance(product_item, LimitedProduct):
+        if isinstance(product_item, LimitedProduct):
             max_amt = product_item.maximum
         elif isinstance(product_item, Product):
             max_amt = product_item.quantity
+        else:
+            max_amt = None  # NonStockedProduct
 
         while True:
             if max_amt is not None:
-                val = input(ConstantStrings.MAKE_ORDER_SELECT_QUANTITY_WITH_MAX.format(max_amt=max_amt)).strip()
+                val = UserText.input_prompt(ConstantStrings.
+                                            MAKE_ORDER_SELECT_QUANTITY_WITH_MAX.
+                                            format(max_amt=max_amt)).strip()
             else:
-                val = input(ConstantStrings.MAKE_ORDER_SELECT_QUANTITY).strip()
+                val = UserText.input_prompt(ConstantStrings.
+                                            MAKE_ORDER_SELECT_QUANTITY).strip()
 
             if val == "":
                 return None  # User wants to cancel and reselect product
@@ -160,12 +168,19 @@ class UserMenu:
                 cls.__print_custom_error(e, ConstantStrings.MAKE_ORDER_ADD_PRODUCT_ERROR)
 
     @classmethod
-    def __finalize_order(cls, orders_cost_list, indexed_product_list):
+    def __finalize_order(cls, orders_list, indexed_product_list):
         """Finalizes the order by displaying the total and updating the store."""
         # Update the store object with the new product list
-        total_amt = sum(orders_cost_list)
+        # (product_item, (price, promotion))
+        total_amt = sum(x[2] for x in orders_list)
         cls.__store = Store([x[1] for x in indexed_product_list])
-        print(ConstantStrings.MAKE_ORDER_AMOUNT.format(total_amt=total_amt))
+        UserText.print_success(ConstantStrings.MAKE_ORDER_AMOUNT.format(total_amt=total_amt))
+        UserText.print_bold("-----Detailed Order-----")
+        for item in orders_list:
+            out = f"{item[0]}, Quantity: {item[1]}, Price: ${item[2]}"
+            if len(item) > 3:
+                out += f", Promotion: {item[3]}"
+            UserText.print_teal(out)
 
     @classmethod
     def __set_menu_options(cls):
@@ -185,6 +200,6 @@ class UserMenu:
         error = str(ex)
         if error.startswith("CE-"):
             error = error.replace("CE-", "")
-            print(error)
+            UserText.print_error(error)
         else:
-            print(default_error)
+            UserText.print_error(default_error)

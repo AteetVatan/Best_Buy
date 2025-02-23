@@ -1,21 +1,28 @@
 """The Non StockProduct Module"""
+from typing import Tuple
+
 from constants import ConstantStrings
+from helpers import UserText
 from models.product_model import ProductModel
 
 
 class LimitedProduct(ProductModel):
     """The Non StockProduct Class"""
-    def __init__(self, name, price, quantity, maximum):
-        super().__init__(name, price, quantity, maximum)
 
-    def buy(self, buy_quantity: (int, float)) -> float:
-        """Method to buy the product"""
+    def buy(self, buy_quantity: (int, float)) -> Tuple[float, str]:
+        """Method to buy the product.
+        :param buy_quantity: The Product Quantity.
+        :return: (price, applied_promotion_name) of type Tuple[float, str].
+        """
         try:
             self.buy_validation(buy_quantity)
+            # price = self.get_best_price(buy_quantity)
+            price_promotion_tuple = self.get_best_price(buy_quantity)
             self.quantity -= buy_quantity
-            return self.price * buy_quantity
+            return price_promotion_tuple
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="quantity", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="quantity", exception=e))
             raise
 
     def buy_validation(self, buy_quantity: (int, float)):

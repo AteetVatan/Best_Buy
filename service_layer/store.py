@@ -3,7 +3,8 @@ import copy
 from typing import List, Tuple, Optional
 from datetime import datetime
 from constants.constant_strings import ConstantStrings
-from service_layer.product import Product
+from helpers import UserText
+from service_layer.products.product import Product
 
 
 class Store:
@@ -16,6 +17,11 @@ class Store:
         formatted_time = datetime.now().strftime("%d.%m.%Y %H.%M.%S")
         Store.__store_instances.append((formatted_time, copy.deepcopy(self.__products)))
 
+    @property
+    def products(self):
+        """The product list."""
+        return self.__products
+
     def add_product(self, product: List[Product]):
         """Adds a new product to the store."""
         try:
@@ -24,7 +30,8 @@ class Store:
             else:
                 raise ValueError(ConstantStrings.PRODUCT_INVALID_TYPE)
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="product", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="product", exception=e))
 
     def remove_product(self, product: List[Product]):
         """Removes a product from store."""
@@ -34,7 +41,8 @@ class Store:
             else:
                 raise ValueError(ConstantStrings.PRODUCT_INVALID_TYPE)
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="product", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="product", exception=e))
 
     def get_total_quantity(self) -> int:
         """Returns how many items are in the store in total."""
@@ -62,8 +70,18 @@ class Store:
                 order_price += item[0].buy(item[1])
             return order_price
         except ValueError as e:
-            print(ConstantStrings.EXCEPTION_STRING.format(field="order", exception=e))
+            UserText.print_error(ConstantStrings.
+                                 EXCEPTION_STRING.format(field="order", exception=e))
             raise
+
+    def __add__(self, other):
+        """Define `+` to combine two boxes."""
+        combined_products = self.products + other.products
+        return Store(products=combined_products)
+
+    def __contains__(self, other):
+        """in operator - dunder method."""
+        return other in self.__products
 
     def __str__(self):
         """String representation of the Store."""
