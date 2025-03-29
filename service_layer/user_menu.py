@@ -5,7 +5,7 @@ from typing import Tuple, List
 
 from constants.constant_strings import ConstantStrings
 from helpers import UserText
-from service_layer.products import Product, LimitedProduct
+from service_layer.products import Product, LimitedProduct, NonStockedProduct
 from service_layer.store import Store
 
 
@@ -140,6 +140,13 @@ class UserMenu:
             max_amt = product_item.quantity
         else:
             max_amt = None  # NonStockedProduct
+
+        if not isinstance(product_item, NonStockedProduct):
+            if product_item.quantity == 0:
+                #The Product is not in the Warehouse.
+                UserText.print_teal(ConstantStrings.PRODUCT_NOT_AVAILABLE)
+                return None
+
 
         while True:
             if max_amt is not None:

@@ -16,6 +16,7 @@ class ConstantStrings:
     PRODUCT_LIST_HEADER = "---products---"
     PRODUCT_LIST_FOOTER = "-----end------"
 
+    PRODUCT_NOT_AVAILABLE = "The Product is not Available."
     PRODUCT_QUANTITY_NOT_AVAILABLE = "This Quantity is not available."
     PRODUCT_QUANTITY_EXCEED_MAXIMUM = "This Quantity exceeds maximum shippable quantity size."
     PRODUCT_INVALID_TYPE = "Invalid product type."
