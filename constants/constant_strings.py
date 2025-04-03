@@ -38,6 +38,7 @@ class ConstantStrings:
     MENU_TOTAL_QUANTITY = "Total of {number} items in store."
 
     MAKE_ORDER_ADD_PRODUCT_ERROR = "Error adding product!\n"
+    MAKE_ORDER_ADD_PRODUCT_QUANTITY_NOT_A_NUMBER_ERROR = "The Quantity can only be an Integer!\n"
     MAKE_ORDER_NO_PRODUCTS = "No products available."
     MAKE_ORDER_FINISH = "\nWhen you want to finish order, [enter an empty text]."
     MAKE_ORDER_PRODUCT_ADDED = "Product added to list!"

@@ -42,7 +42,12 @@ class UserMenu:
                 UserText.print_teal(f"{key}. {description}")
 
             try:
-                choice = int(float(UserText.input_prompt(ConstantStrings.MENU_OPT_PROMPT).strip()))
+                choice = int(UserText.input_prompt(ConstantStrings.MENU_OPT_PROMPT).strip())
+            except ValueError as e:
+                print(ConstantStrings.MENU_OPT_INVALID)
+                continue
+
+            try:
                 if choice in cls.__menu_options:
                     cls.__menu_options[choice][1]()
                 else:
@@ -121,7 +126,13 @@ class UserMenu:
                 return None  # User wants to exit
 
             try:
-                index = int(float(val))
+                index = int(val)
+            except ValueError as e:
+                cls.__print_custom_error(e, ConstantStrings.
+                                         MAKE_ORDER_ADD_PRODUCT_INDEX_ERROR.format(prd_len=prd_len))
+                continue
+
+            try:
                 if not 1 <= index <= prd_len:
                     raise ValueError(ConstantStrings.
                                      MAKE_ORDER_ADD_PRODUCT_INDEX_ERROR.format(prd_len=prd_len))
@@ -143,10 +154,9 @@ class UserMenu:
 
         if not isinstance(product_item, NonStockedProduct):
             if product_item.quantity == 0:
-                #The Product is not in the Warehouse.
+                # The Product is not in the Warehouse.
                 UserText.print_teal(ConstantStrings.PRODUCT_NOT_AVAILABLE)
                 return None
-
 
         while True:
             if max_amt is not None:
@@ -161,7 +171,12 @@ class UserMenu:
                 return None  # User wants to cancel and reselect product
 
             try:
-                amt = float(val)
+                amt = int(val)
+            except ValueError as e:
+                cls.__print_custom_error(e, ConstantStrings.MAKE_ORDER_ADD_PRODUCT_QUANTITY_NOT_A_NUMBER_ERROR)
+                continue
+
+            try:
                 if amt < 0:
                     raise ValueError(ConstantStrings.MAKE_ORDER_INVALID_QUANTITY)
 
@@ -184,7 +199,7 @@ class UserMenu:
         UserText.print_success(ConstantStrings.MAKE_ORDER_AMOUNT.format(total_amt=total_amt))
         UserText.print_bold("-----Detailed Order-----")
         for item in orders_list:
-            out = f"{item[0]}, Quantity: {item[1]}, Price: ${item[2]}"
+            out = f"{item[0]}, Quantity: {item[1]}, Price: ${item[2]: .2f}"
             if len(item) > 3:
                 out += f", Promotion: {item[3]}"
             UserText.print_teal(out)
